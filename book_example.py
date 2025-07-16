@@ -2,13 +2,10 @@ import numpy as np
 from scipy.optimize import root
 
 def churchill_correlation(Re, eD):
-    if Re < 2300:
-        return 64 / Re
-    else:
-        A = (-2.457 * np.log((7/Re)**0.9 + 0.27*eD))**16
-        B = (37530 / Re)**16
-        f = 8 * ((8/Re)**12 + 1/(A+B)**1.5)**(1/12)
-        return f
+    A = (-2.457 * np.log((7/Re)**0.9 + 0.27*eD))**16
+    B = (37530 / Re)**16
+    f = 8 * ((8/Re)**12 + 1/(A+B)**1.5)**(1/12)
+    return f
 
 def calculate_head_loss(Q, D, L, rho, mu, e):
     A = np.pi * (D/2)**2
@@ -19,7 +16,6 @@ def calculate_head_loss(Q, D, L, rho, mu, e):
     hf = f * (L/D) * (v**2 / (2 * 9.81))
     return hf
 
-# === Dados do problema ===
 D = {
     'A': 0.038,
     'B': 0.038,
@@ -42,11 +38,9 @@ L = {
     'H': 1.5
 }
 
-# Condições de Contorno
 P_in = 4e5
 P_out = 1e5
 
-# Propriedades
 rho = 1000
 mu = 0.0001
 e = 0.00026
@@ -61,7 +55,7 @@ def system_equations(Q):
 
     eqs = []
 
-    # === Equações de continuidade ===
+    # Equações de continuidade
     # Nó 2: Qa = Qb + Qe
     eqs.append(Q[0] - Q[1] - Q[4])
     # Nó 3: Qa = Qc
@@ -74,34 +68,36 @@ def system_equations(Q):
     eqs.append(Q[4] - Q[7])
 
 
-    # === Equações de energia nos loops ===
+    # Equações de conservação da energia
     # h = ha + hb + hc + hd
     eqs.append(P_in - P_out - (hf[0] + hf[1] + hf[2] + hf[3]) * rho * 9.81)
     # hb = he + hf + hh
     eqs.append(hf[1] - hf[4] - hf[5] - hf[7])
-    eqs.append(hf[1] - hf[4] - hf[6] - hf[7])
     # hf = hg
     eqs.append(hf[5] - hf[6])
-
-
 
     return eqs
 #
 # from scipy.optimize import show_options
 # show_options(solver="minimize")
 
-# Chute inicial: 1 L/min = 0.0167 kg/s / rho ≈ 0.0000167 m³/s
-Q0 = np.ones(8) * 2.8e-3  # 1 L/s para cada trecho como chute inicial
+Q0 = np.ones(8) * 2.8e-3
 
-# Resolver
-sol = root(system_equations, Q0, method='lm', options={'xtol': 1e-12 ,'maxiter': 100000})
+sol = root(system_equations, Q0, method='lm', options={'xtol': 1e-12 ,'maxiter': 1000000})
 
 
-# Mostrar resultados
 if sol.success:
+    print('=== Vazões ===')
     for i, sec in enumerate(['A','B','C','D','E','F','G','H']):
         print(f"Vazão em {sec}: {sol.x[i]*1000*60:.2f} L/min;")
+    print('=== residuos para as funções ===')
     for i, sec in enumerate(['A','B','C','D','E','F','G','H']):
-        print(f"Função: {sol.fun[i]} ")
+        print(f"Função {i}: {sol.fun[i]} ")
 else:
     print("Solução não convergiu:", sol.message)
+
+print('=== Chegando a conservação ===')
+print(f'(A = B + C) {sol.x[0]*1000*60:.2f} = {sol.x[1]*1000*60:.2f} + {sol.x[4]*1000*60:.2f} = {sol.x[1]*1000*60 + sol.x[4]*1000*60}')
+print(f'(E = F + G) {sol.x[4]*1000*60:.2f} = {sol.x[5]*1000*60:.2f} + {sol.x[6]*1000*60:.2f} = {sol.x[5]*1000*60 + sol.x[6]*1000*60}')
+
+

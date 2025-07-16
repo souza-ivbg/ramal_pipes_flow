@@ -13,8 +13,8 @@ class Node:
     def set_pressure(self, P):
         self.P = P
 
-    def flow_equation(self):
-        for pipe in self.pipes_in:
+    def flow_equation(self, pipes_in, pipes_out):
+        for pipe in pipes_in:
             self.Q += pipe.Q
         for pipe in self.pipes_out:
             self.Q -= pipe.Q
