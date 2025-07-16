@@ -23,7 +23,6 @@ def calculate_pressure(Q, P_in, P_out, diameter, length, rho, mu, wall_roughness
     v = (4 * Q) / (np.pi * (diameter ** 2))
     Re = (diameter * v * rho) / mu
     f = churchill_correlation(Re, wall_roughness)
-    # A equação foi ajustada para usar a posição em vez do comprimento total para o cálculo da perda de carga
     h_M = f * (position / diameter) * ((v ** 2) / (2 * 9.81))
 
     return P_in - h_M * (rho * 9.81) - P_out
@@ -35,7 +34,6 @@ def calculate_loss(Q, h_M, diameter, length, rho, mu, wall_roughness, position=N
     v = (4 * Q) / (np.pi * (diameter ** 2))
     Re = (diameter * v * rho) / mu
     f = churchill_correlation(Re, wall_roughness)
-    # A equação foi ajustada para usar a posição em vez do comprimento total para o cálculo da perda de carga
     return f * (position / diameter) * ((v ** 2) / (2 * 9.81)) - h_M
 
 def calculate_flow_balance(pipes_in, pipes_out):
