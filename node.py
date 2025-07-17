@@ -1,11 +1,8 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import fsolve
-
 class Node:
-    def __init__(self):
+    def __init__(self, name):
+        self.name = name
+
         self.P = None
-        self.Q = None
 
         self.pipes_in = []
         self.pipes_out = []
@@ -13,10 +10,3 @@ class Node:
     def set_pressure(self, P):
         self.P = P
 
-    def flow_equation(self, pipes_in, pipes_out):
-        for pipe in pipes_in:
-            self.Q += pipe.Q
-        for pipe in self.pipes_out:
-            self.Q -= pipe.Q
-
-        return self.Q

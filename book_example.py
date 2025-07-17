@@ -77,9 +77,7 @@ def system_equations(Q):
     eqs.append(hf[5] - hf[6])
 
     return eqs
-#
-# from scipy.optimize import show_options
-# show_options(solver="minimize")
+
 
 Q0 = np.ones(8) * 2.8e-3
 

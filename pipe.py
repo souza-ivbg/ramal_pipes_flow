@@ -1,16 +1,11 @@
-'''
-calculo do Q é feito no node
-calculo da pressão é feito no pipe
-tem que fazer a comunicação node <-> pipe
-
-'''
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.optimize import fsolve
 
 class Pipe:
-    def __init__(self, node_in, node_out, diameter, length, wall_roughness, rho, mu, d_unit='m'):
+    def __init__(self, name, node_in, node_out, diameter, length, wall_roughness, rho, mu, d_unit='m'):
+        self.name = name
+
         self.node_in = node_in
         self.node_out = node_out
 
@@ -61,15 +56,4 @@ class Pipe:
         h_M = f * (self.length / self.diameter) * (v**2 / (2 * 9.81))
 
         return P_in - P_out - h_M * (self.rho*9.81)
-
-    def head_loss_equation(self, Q, position=None):
-        if position is None:
-            position = self.length
-
-        v = (4 * Q)/(np.pi * (self.diameter**2))
-        Re = (self.diameter * v * self.rho)/self.mu
-        f = self.churchill_correlation(Re)
-        h_M = f * (self.length / self.diameter) * (v**2 / (2 * 9.81))
-
-        return h_M * (self.rho*9.81)
 
