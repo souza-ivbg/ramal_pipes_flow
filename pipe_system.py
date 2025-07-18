@@ -10,7 +10,6 @@ class PipeSystem:
     def __init__(self):
         self.pipes = []
         self.nodes = []
-        self.node_internal_indices = []
         self.x0 = []
 
         self.system_equation = None
@@ -23,12 +22,12 @@ class PipeSystem:
         self.pipes.append(pipe)
 
     def initialize(self):
-        # Clear previous indices to allow re-initialization
-        self.node_internal_indices = []
+        # Clean the previous indexes to permit more than one initialization
+        self.node_internal_indexes = []
 
         for i, node in enumerate(self.nodes):
             if node.P is None:
-                self.node_internal_indices.append(i)
+                self.node_internal_indexes.append(i)
 
         def system_equation(x):
             equations = []
@@ -45,7 +44,7 @@ class PipeSystem:
                     P.append(P_internal[internal_counter])
                     internal_counter += 1
 
-            # Equações de conservação da energia (1 por pipe)
+            # Energy conservation equation (1 per pipe)
             for i, pipe in enumerate(self.pipes):
                 P_in = P[self.nodes.index(pipe.node_in)]
                 P_out = P[self.nodes.index(pipe.node_out)]
@@ -53,8 +52,8 @@ class PipeSystem:
                 P_i_residual = pipe.pressure_equation(P_in, P_out, Q[i])
                 equations.append(P_i_residual)
 
-            # Equações de continuidade (1 por node interno)
-            for node_index in self.node_internal_indices:
+            # Continuity Equations (1 per intern node)
+            for node_index in self.node_internal_indexes:
                 node = self.nodes[node_index]
                 Q_eq = 0
                 for j, pipe in enumerate(self.pipes):
@@ -68,16 +67,16 @@ class PipeSystem:
 
         self.system_equation = system_equation
 
-    def solve(self):
+    def solve(self, Q0=0.028, P0=1e5):
 
-        Q0_ref = np.ones(len(self.pipes)) * 0.028
+        Q0_ref = np.ones(len(self.pipes)) * Q0
 
         known_pressures = [node.P for node in self.nodes if node.P is not None]
         if known_pressures:
             avg_P = np.mean(known_pressures)
         else:
-            avg_P = 1e5
-        P0_ref = np.ones(len(self.node_internal_indices)) * avg_P
+            avg_P = P0
+        P0_ref = np.ones(len(self.node_internal_indexes)) * avg_P
 
         x0 = np.concatenate((Q0_ref, P0_ref))
 
@@ -89,6 +88,7 @@ class PipeSystem:
             return
 
         self.system_solution = sol
+
         x = sol.x
 
         Q_solved = x[:len(self.pipes)]
@@ -98,7 +98,7 @@ class PipeSystem:
             pipe.Q = Q_solved[i]
 
         internal_counter = 0
-        for i in self.node_internal_indices:
+        for i in self.node_internal_indexes:
             self.nodes[i].P = P_internal_solved[internal_counter]
             internal_counter += 1
 

@@ -55,7 +55,7 @@ def system_equations(Q):
 
     eqs = []
 
-    # Equações de continuidade
+    # Continuity equations
     # Nó 2: Qa = Qb + Qe
     eqs.append(Q[0] - Q[1] - Q[4])
     # Nó 3: Qa = Qc
@@ -68,7 +68,7 @@ def system_equations(Q):
     eqs.append(Q[4] - Q[7])
 
 
-    # Equações de conservação da energia
+    # Energy conservation equations
     # h = ha + hb + hc + hd
     eqs.append(P_in - P_out - (hf[0] + hf[1] + hf[2] + hf[3]) * rho * 9.81)
     # hb = he + hf + hh
