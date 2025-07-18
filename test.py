@@ -1,10 +1,10 @@
-import numpy as np
-import matplotlib.pyplot as plt
-from scipy.optimize import fsolve
+""""
+This code exemplifies the use of the pipe system solver. The case used to exemplify is the example 8.11 from the 7ed of the fluid mechanic book (Fox and McDonalds)
+"""
 
-from node import Node
-from pipe import Pipe
-from pipe_system import PipeSystem
+from src.node import Node
+from src.pipe import Pipe
+from src.pipe_system import PipeSystem
 
 D = {
     'A': 0.038,

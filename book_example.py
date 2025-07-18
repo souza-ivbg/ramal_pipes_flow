@@ -1,3 +1,7 @@
+""""
+This code contain the specific solution to the example 8.11 from the 7ed of the fluid mechanic book (Fox and McDonalds)
+"""
+
 import numpy as np
 from scipy.optimize import root
 
